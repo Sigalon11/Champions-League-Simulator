@@ -1,11 +1,13 @@
-import random # Random will be used later
+import random
 
 class Team():
-    def __init__(self, name , pot , country, players=0, points=0 , games=0 , wins=0 , losses=0 , draw=0,  goals=0 , goals_up=0):
+    def __init__(self, name , pot , country, players=0, opponents=None , pots_count=None , points=0 , games=0 , wins=0 , losses=0 , draw=0,  goals=0 , goals_up=0):
         self.name = name
-        self.players = players
         self.pot = pot
         self.country = country
+        self.players = players
+        self.opponents = []
+        self.pots_count = {1:0 , 2:0 , 3:0 , 4:0}
         self.points = points
         self.games = games
         self.wins = wins
@@ -101,3 +103,35 @@ RCLens = Team("RC Lens" , 4 , "France", RCLens_players)
 SlaviaPrague = Team("SK Slavia Prague" , 4 , "Czechia" , SlaviaPrague_players)
 Lille = Team("LOSC Lille" , 3, "France", Lille_players)
 SlovanBratislava = Team("Slovan Bratislava" , 4 , "Slovakia" , SlovanBratislava_players)
+
+all_teams = [
+    Arsenal, PSG, RealMadrid, Como, Barcelona, AstonVila, ManCity, Liverpool,
+    ClubBrugge, SportingCP, RealBetis, BorussiaDortmund, BayernMunich, VfBStuttgart,
+    InterMilan, LASK, MAnUnited, Galatasaray, Fenerbahce, ASRoma, Shakhtar,
+    VikingFK, AtleticoMadrid, PSV, Bodo, Porto, napoli, Villarreal, AEKAthens,
+    RBLeipzig, SabahFK, Feyenoord, RCLens, SlaviaPrague, Lille, SlovanBratislava
+]
+
+def draw_teams():
+    NOG = 0
+    chosen = random.choice(all_teams)
+    alr_rival = []
+    while True:
+        rival = random.choice(all_teams)
+        if rival in alr_rival:
+            continue
+        elif rival == chosen:
+            continue
+        elif chosen.country == rival.country:
+            continue
+        else:
+            if chosen.pots_count[rival.pot] == 2:
+                continue
+            chosen.pots_count[rival.pot] += 1
+            print(f'{chosen.name} is playing {rival.name}')
+            alr_rival.append(rival)
+            NOG +=1
+            if NOG == 8:
+                chosen.opponents = alr_rival
+                break
+draw_teams()
