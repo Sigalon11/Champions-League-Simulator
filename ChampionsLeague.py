@@ -113,25 +113,39 @@ all_teams = [
 ]
 
 def draw_teams():
-    NOG = 0
-    chosen = random.choice(all_teams)
-    alr_rival = []
+
     while True:
-        rival = random.choice(all_teams)
-        if rival in alr_rival:
-            continue
-        elif rival == chosen:
-            continue
-        elif chosen.country == rival.country:
-            continue
-        else:
-            if chosen.pots_count[rival.pot] == 2:
-                continue
-            chosen.pots_count[rival.pot] += 1
-            print(f'{chosen.name} is playing {rival.name}')
-            alr_rival.append(rival)
-            NOG +=1
-            if NOG == 8:
-                chosen.opponents = alr_rival
+        for team in all_teams:
+            team.opponents = []
+            team.pots_count = {1:0 , 2:0 , 3:0 , 4:0}
+        stuck =False
+
+        for chosen in all_teams:
+            attempts=0
+            while len(chosen.opponents) < 8:
+                attempts += 1
+                if attempts > 500:
+                    stuck = True
+                    break
+                rival = random.choice(all_teams)
+                if rival in chosen.opponents:
+                    continue
+                elif rival == chosen:
+                    continue
+                elif chosen.country == rival.country:
+                    continue
+                elif chosen.pots_count[rival.pot] == 2 or rival.pots_count[chosen.pot] ==2:
+                        continue
+                else:
+                    chosen.pots_count[rival.pot] += 1
+                    rival.pots_count[chosen.pot] += 1
+                    chosen.opponents.append(rival)
+                    rival.opponents.append(chosen)
+            if stuck:
                 break
+        if not stuck:
+            break
 draw_teams()
+for team in all_teams:
+    opponents_names = [opp.name for opp in team.opponents]
+    print(f"{team.name} Playing: {', '.join(opponents_names)}")
