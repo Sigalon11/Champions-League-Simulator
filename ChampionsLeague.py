@@ -1,7 +1,7 @@
 import random
 
 class Team():
-    def __init__(self, name , pot , country, players=0, opponents=None , pots_count=None , points=0 , games=0 , wins=0 , losses=0 , draw=0,  goals=0 , goals_up=0):
+    def __init__(self, name , pot , country, players=0, opponents=None , pots_count=None ,  points=0 , games=0 , wins=0 , losses=0 , draw=0,  goals=0 , goals_up=0):
         self.name = name
         self.pot = pot
         self.country = country
@@ -117,7 +117,10 @@ def draw_teams():
     while True:
         for team in all_teams:
             team.opponents = []
-            team.pots_count = {1:0 , 2:0 , 3:0 , 4:0}
+            team.pots_count = {1:{'home': 0 ,'away' : 0 , 'total' : 0} ,
+                               2:{'home' : 0 , 'away' : 0 , 'total' : 0} ,
+                               3:{'home' : 0 , 'away' : 0 , 'total' : 0} ,
+                               4:{'home' : 0 , 'away' : 0 , 'total' : 0 }}
         stuck =False
 
         for chosen in all_teams:
@@ -128,24 +131,30 @@ def draw_teams():
                     stuck = True
                     break
                 rival = random.choice(all_teams)
+                HA = random.choice(['home' , 'away'])
+                rival_HA = 'home' if HA == 'away' else 'away'
                 if rival in chosen.opponents:
                     continue
                 elif rival == chosen:
                     continue
                 elif chosen.country == rival.country:
                     continue
-                elif chosen.pots_count[rival.pot] == 2 or rival.pots_count[chosen.pot] ==2:
-                        continue
+                elif chosen.pots_count[rival.pot]['total'] == 2 or rival.pots_count[chosen.pot]['total'] ==2:
+                    continue
+                elif chosen.pots_count[rival.pot][HA] == 1 or  rival.pots_count[chosen.pot][rival_HA] ==1:
+                    continue
                 else:
-                    chosen.pots_count[rival.pot] += 1
-                    rival.pots_count[chosen.pot] += 1
-                    chosen.opponents.append(rival)
-                    rival.opponents.append(chosen)
+                    chosen.pots_count[rival.pot]['total'] += 1
+                    rival.pots_count[chosen.pot]['total'] += 1
+                    chosen.pots_count[rival.pot][HA] += 1
+                    rival.pots_count[chosen.pot][rival_HA] += 1
+                    chosen.opponents.append((rival , HA))
+                    rival.opponents.append((chosen , rival_HA))
             if stuck:
                 break
         if not stuck:
             break
 draw_teams()
 for team in all_teams:
-    opponents_names = [opp.name for opp in team.opponents]
+    opponents_names = [f"{opp.name}({ha})" for opp,ha in team.opponents]
     print(f"{team.name} Playing: {', '.join(opponents_names)}")
